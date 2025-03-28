@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "620322343059",
+    "project_id": "flashsmith-ad0e4",
+    "storage_bucket": "flashsmith-ad0e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620322343059:android:958bd30fb6365b1dd16566",
+        "android_client_info": {
+          "package_name": "com.example.flashsmith"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4d9g_AYS82QAAv7B2tkyR3JfpqLbrsnc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
