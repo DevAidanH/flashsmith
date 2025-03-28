@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flashsmith/components/buttons.dart';
+import 'package:flashsmith/components/generate_flash_cards.dart';
 import 'package:flashsmith/services/firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -53,6 +55,10 @@ class _HomepageState extends State<Homepage> {
     FirebaseAuth.instance.signOut();
   }
 
+  void goToGen(){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => GenerateFlashCards()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +83,8 @@ class _HomepageState extends State<Homepage> {
             Map<String, dynamic>? user = snapshot.data!.data();
             return Column(
               children: [
-                Text("Welcome ${user!["username"]}")
+                Text("Welcome ${user!["username"]}"),
+                Buttons(text: "Generate Cards", onTap: goToGen)
               ],
             );
           }
