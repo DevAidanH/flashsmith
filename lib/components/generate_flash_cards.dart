@@ -29,9 +29,19 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
     });
 
     try {
-      List<Map<String, String>> result = await sendOpenAiRequest(getPDFtext());
+      List result = await getPDFtext();
+      print("This is the output ${result[0].toString().substring(65)}");
+      //final data = result[0].toString().substring(65);
+      //print(data);
+
+      //final split = data.split('front:');
+      //final Map<int, String> values = {
+//for (int i = 0; i < split.length; i++)
+//i: split[i]
+      //};
+     // print(values);
       setState(() {
-        flashcards = result;
+        //flashcards = data;
       });
     } catch (e) {
       setState(() {
@@ -45,7 +55,7 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
   }
 
   //Extract all text from PDF
-  Future<String> getPDFtext() async {
+  Future<List> getPDFtext() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if(result != null){
       File file = File(result.files.single.path!);
@@ -55,42 +65,49 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
         print('Failed to get PDF text.');
       }
     }
-    return text;
+    return sendOpenAiRequest(text);
   }
 
   //Contact openAI
-  Future sendOpenAiRequest(data) async {
+  Future<List> sendOpenAiRequest(data) async {
     final apiKey = dotenv.env["API_KEY"];
-    final url = Uri.parse("https://api.openai.com/v1/completions");
-    String prompt = "Generate flashcards from the text provided at the end of this prompt. Ignore any content tables, footers or front pages contained within the text. Each flashcard should have a front and a back, the output should be in json format. Make sure there is an appropriate number of cards for the content provided. The text is as follow: $data";
+    String prompt = "Generate flashcards from the text provided at the end of this prompt. Ignore any content tables, footers or front pages contained within the text. Each flashcard should have a front and a back. Make sure there is an appropriate number of cards for the content provided. The output should be formatted as follows 'front: example text, back: example text: front: example two, back: example two:' The text is as follow: $data";
 
-      final response = await http.post(
-        url,
+      var flashcardsResponse = await http.post(
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
           'Authorization': 'Bearer $apiKey',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'model': 'gpt-4-turbo',
-          'prompt': prompt,
+          'model': 'gpt-3.5-turbo',
+          'messages': [
+            {
+              'role': 'system',
+              'content': 'You are an assistant that converts PDF content into flashcards.'
+            },
+            {
+              'role': 'user',
+              'content': prompt
+            },
+          ],
           'max_tokens': 500,
-          'temperature': 0.7
+          'temperature': 0.7,
         }),
       );
 
 
-    if (response.statusCode == 200) {
-      print("working 1");
+    if (flashcardsResponse.statusCode == 200) {
       // Parse and handle the response.
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-
+      final Map<String, dynamic> responseData = jsonDecode(flashcardsResponse.body);
       // Extract flashcards from the first choice
       final List<dynamic> choices = responseData['choices'];
-      print(choices);
-      final String textResponse = choices[0]['text'];
+      return choices;
+      /*print("This is the choices $choices");
+      //final String textResponse = choices[1]['text'];
 
       // Split the text into question-answer pairs
-      List<String> rawFlashcards = textResponse.split("\n\n");
+      List<String> rawFlashcards = choices[0].split("\n\n");
       List<Map<String, String>> parsedFlashcards = [];
 
       for (String flashcard in rawFlashcards) {
@@ -101,12 +118,12 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
       }
       print(parsedFlashcards);
       return parsedFlashcards;
-
+*/
     } else {
-      print('Request failed with status: ${response.statusCode}');
-      print('Response: ${response.body}');
+      print('Request failed with status: ${flashcardsResponse.statusCode}');
+      print('Response: ${flashcardsResponse.body}');
     }
-    return jsonDecode(response.body);
+    return jsonDecode(flashcardsResponse.body);
   }
 
 
