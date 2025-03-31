@@ -2,16 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService{
   //Get database ref
-  final CollectionReference cards = FirebaseFirestore.instance.collection("cards");
+  final CollectionReference users = FirebaseFirestore.instance.collection("Users");
+  
+  get generatedCards => null;
 
   //Create
-  Future<void> addCard(String front, String back){
+  /*Future<void> addCard(String front, String back){
     return cards.add({
       "front": front,
       "back": back
     });
-  }
-
+    
   //Read
   Stream<QuerySnapshot> getCardsStream(){
     final cardsStream = cards.snapshots();
@@ -31,4 +32,18 @@ class FirestoreService{
   Future<void> deleteCard(String docId){
     return cards.doc(docId).delete();
   }
+  }*/
+
+  //Create Generated Card
+  Future <void> addGeneratedCard(String uid, List card){
+    return users.doc(uid).set({
+      "generatedCards": FieldValue.arrayUnion([
+        {
+          "front": card[0],
+          "back": card[1]
+        }
+      ]) 
+    }, SetOptions(merge: true)); 
+  }
+
 }

@@ -39,7 +39,7 @@ class _SignupState extends State<Signup> {
       try{
         UserCredential? userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailController.text, password: passwordController.text);
         //Add new user to database
-        createUserDocument(userCredential);
+        await createUserDocument(userCredential);
         if(context.mounted)Navigator.pop(context);
         
       }on FirebaseAuthException catch (e){

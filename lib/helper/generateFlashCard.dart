@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:read_pdf_text/read_pdf_text.dart';
 
-Future<Object> generateFlashCards() async {
+Future<List> generateFlashCards() async {
     final apiKey = dotenv.env["API_KEY"];
     String text = "";
     List<List<String>> flashcards = [];
@@ -17,7 +17,7 @@ Future<Object> generateFlashCards() async {
       try {
         text = await ReadPdfText.getPDFtext(file.path);
       } on PlatformException {
-        return('Failed to get PDF text.');
+        throw('Failed to get PDF text.');
       }
     }
 
@@ -60,6 +60,6 @@ Future<Object> generateFlashCards() async {
       return flashcards;
     } 
     else {
-      return('Request failed with status: ${flashcardsResponse.statusCode}');
+      throw('Request failed with status: ${flashcardsResponse.statusCode}');
     }
 }

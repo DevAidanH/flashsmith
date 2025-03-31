@@ -21,6 +21,8 @@ class _HomepageState extends State<Homepage> {
   //Get current logged in user
   User? currentUser = FirebaseAuth.instance.currentUser;
 
+  String uid = FirebaseAuth.instance.currentUser!.uid;
+
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetails() async {
     return await FirebaseFirestore.instance.collection("Users").doc(currentUser!.uid).get();
   }
@@ -56,7 +58,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   void goToGen(){
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Generateflow()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Generateflow(uid: uid,)));
   }
 
   @override
@@ -64,6 +66,7 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Welcome"),
+        automaticallyImplyLeading: false, 
         actions: [
           IconButton(onPressed: () => logout(), icon: Icon(Icons.logout))
         ],
