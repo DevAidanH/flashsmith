@@ -19,6 +19,7 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
   String text = "";
 
   List<Map<String, String>> flashcards = [];
+  List<List<String>> flashcards2 = [];
   bool isLoading = false;
   String? errorMessage;
 
@@ -30,18 +31,22 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
 
     try {
       List result = await getPDFtext();
-      print("This is the output ${result[0].toString().substring(65)}");
-      //final data = result[0].toString().substring(65);
-      //print(data);
+      //print("This is the output ${result[0].toString().substring(46)}");
+      final data = result[0].toString().substring(47);
 
-      //final split = data.split('front:');
-      //final Map<int, String> values = {
-//for (int i = 0; i < split.length; i++)
-//i: split[i]
-      //};
-     // print(values);
+      
+  
+      RegExp regExp = RegExp(r"\{'front': (.*?), 'back': (.*?)\}");
+      for (RegExpMatch match in regExp.allMatches(data)) {
+        String front = match.group(1)?.trim() ?? "";
+        String back = match.group(2)?.trim() ?? "";
+        flashcards2.add([front, back]);
+      }
+      
+      print(flashcards2);
+
       setState(() {
-        //flashcards = data;
+        
       });
     } catch (e) {
       setState(() {
@@ -71,7 +76,7 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
   //Contact openAI
   Future<List> sendOpenAiRequest(data) async {
     final apiKey = dotenv.env["API_KEY"];
-    String prompt = "Generate flashcards from the text provided at the end of this prompt. Ignore any content tables, footers or front pages contained within the text. Each flashcard should have a front and a back. Make sure there is an appropriate number of cards for the content provided. The output should be formatted as follows 'front: example text, back: example text: front: example two, back: example two:' The text is as follow: $data";
+    String prompt = "Generate flashcards from the text provided at the end of this prompt. Ignore any content tables, footers or front pages contained within the text. Each flashcard should have a front and a back. Make sure there is an appropriate number of cards for the content provided. The output should be formatted as follows '{'front': example text, 'back': example text} {'front': example two, 'back': example two}' The text is as follow: $data";
 
       var flashcardsResponse = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
@@ -136,16 +141,16 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
             ? CircularProgressIndicator()
             : errorMessage != null
                 ? Text('Error: $errorMessage', style: TextStyle(color: Colors.red))
-                : flashcards.isEmpty
+                : flashcards2.isEmpty
                     ? Text('No flashcards yet. Tap the button to generate!')
                     : ListView.builder(
-                        itemCount: flashcards.length,
+                        itemCount: flashcards2.length,
                         itemBuilder: (context, index) {
                           return Card(
                             margin: EdgeInsets.all(8.0),
                             child: ListTile(
-                              title: Text(flashcards[index]['question'] ?? 'No question'),
-                              subtitle: Text(flashcards[index]['answer'] ?? 'No answer'),
+                              title: Text(flashcards2[index][0]),
+                              subtitle: Text(flashcards2[index][1]),
                             ),
                           );
                         },
