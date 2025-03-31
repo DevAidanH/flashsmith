@@ -15,11 +15,7 @@ class GenerateFlashCards extends StatefulWidget {
 }
 
 class _GenerateFlashCardsState extends State<GenerateFlashCards> {
-
-  String text = "";
-
-  List<Map<String, String>> flashcards = [];
-  List<List<String>> flashcards2 = [];
+  List<List<String>> flashcards = [];
   bool isLoading = false;
   String? errorMessage;
 
@@ -30,24 +26,18 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
     });
 
     try {
-      List result = await getPDFtext();
-      //print("This is the output ${result[0].toString().substring(46)}");
-      final data = result[0].toString().substring(47);
+      String result = await convertPDFAndSendRequest();
 
-      
-  
+      //Parse data from API into a matrix. 
+      result = result.substring(47);
       RegExp regExp = RegExp(r"\{'front': (.*?), 'back': (.*?)\}");
-      for (RegExpMatch match in regExp.allMatches(data)) {
+      for (RegExpMatch match in regExp.allMatches(result)) {
         String front = match.group(1)?.trim() ?? "";
         String back = match.group(2)?.trim() ?? "";
-        flashcards2.add([front, back]);
+        flashcards.add([front, back]);
       }
-      
-      print(flashcards2);
 
-      setState(() {
-        
-      });
+      setState(() {});
     } catch (e) {
       setState(() {
         errorMessage = e.toString();
@@ -60,21 +50,22 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
   }
 
   //Extract all text from PDF
-  Future<List> getPDFtext() async {
+  Future <String> convertPDFAndSendRequest() async {
+    String text = "";
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if(result != null){
       File file = File(result.files.single.path!);
       try {
         text = await ReadPdfText.getPDFtext(file.path);
       } on PlatformException {
-        print('Failed to get PDF text.');
+        return('Failed to get PDF text.');
       }
     }
     return sendOpenAiRequest(text);
   }
 
   //Contact openAI
-  Future<List> sendOpenAiRequest(data) async {
+  Future <String> sendOpenAiRequest(data) async {
     final apiKey = dotenv.env["API_KEY"];
     String prompt = "Generate flashcards from the text provided at the end of this prompt. Ignore any content tables, footers or front pages contained within the text. Each flashcard should have a front and a back. Make sure there is an appropriate number of cards for the content provided. The output should be formatted as follows '{'front': example text, 'back': example text} {'front': example two, 'back': example two}' The text is as follow: $data";
 
@@ -105,61 +96,49 @@ class _GenerateFlashCardsState extends State<GenerateFlashCards> {
     if (flashcardsResponse.statusCode == 200) {
       // Parse and handle the response.
       final Map<String, dynamic> responseData = jsonDecode(flashcardsResponse.body);
-      // Extract flashcards from the first choice
-      final List<dynamic> choices = responseData['choices'];
+      String choices = responseData['choices'].toString();
       return choices;
-      /*print("This is the choices $choices");
-      //final String textResponse = choices[1]['text'];
-
-      // Split the text into question-answer pairs
-      List<String> rawFlashcards = choices[0].split("\n\n");
-      List<Map<String, String>> parsedFlashcards = [];
-
-      for (String flashcard in rawFlashcards) {
-        List<String> parts = flashcard.split("\n");
-        if (parts.length >= 2) {
-          parsedFlashcards.add({'question': parts[0], 'answer': parts[1]});
-        }
-      }
-      print(parsedFlashcards);
-      return parsedFlashcards;
-*/
-    } else {
-      print('Request failed with status: ${flashcardsResponse.statusCode}');
-      print('Response: ${flashcardsResponse.body}');
+    } 
+    else {
+      return('Request failed with status: ${flashcardsResponse.statusCode}');
     }
-    return jsonDecode(flashcardsResponse.body);
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Flashcards')),
+      appBar: AppBar(title: Text("Flashcard Generation")),
       body: Center(
-        child: isLoading
-            ? CircularProgressIndicator()
-            : errorMessage != null
-                ? Text('Error: $errorMessage', style: TextStyle(color: Colors.red))
-                : flashcards2.isEmpty
-                    ? Text('No flashcards yet. Tap the button to generate!')
-                    : ListView.builder(
-                        itemCount: flashcards2.length,
-                        itemBuilder: (context, index) {
-                          return Card(
-                            margin: EdgeInsets.all(8.0),
-                            child: ListTile(
-                              title: Text(flashcards2[index][0]),
-                              subtitle: Text(flashcards2[index][1]),
-                            ),
-                          );
-                        },
-                      ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: generateFlashcards,
-        child: Icon(Icons.flash_on),
-      ),
+            child: isLoading
+                ? CircularProgressIndicator()
+                : errorMessage != null
+                    ? Text("Error: $errorMessage", style: TextStyle(color: Colors.red))
+                    : flashcards.isEmpty
+                        ? Padding(
+                          padding: const EdgeInsets.all(25.0),
+                          child: Text("Please only upload a PDF Document and wait a few moments for your flashcards to be generated", textAlign: TextAlign.center),
+                        )
+                        : ListView.builder(
+                            itemCount: flashcards.length,
+                            itemBuilder: (context, index) {
+                              return Card(
+                                margin: EdgeInsets.all(8.0),
+                                child: ListTile(
+                                  title: Text(flashcards[index][0]),
+                                  subtitle: Text(flashcards[index][1]),
+                                ),
+                              );
+                            },
+                          ),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Center(
+            child: GestureDetector(
+              onTap: generateFlashcards,
+              child: Text("Click here to upload your PDF", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            ),
+          )
+        ),
     );
   }
 }
