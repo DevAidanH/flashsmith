@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flashsmith/components/buttons.dart';
-import 'package:flashsmith/components/generate_flash_cards.dart';
+import 'package:flashsmith/pages/generateflow.dart';
 import 'package:flashsmith/services/firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -56,7 +56,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   void goToGen(){
-    Navigator.push(context, MaterialPageRoute(builder: (context) => GenerateFlashCards()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Generateflow()));
   }
 
   @override
