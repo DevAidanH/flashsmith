@@ -62,7 +62,9 @@ class _ReviewflowState extends State<Reviewflow> {
       appBar: AppBar(),
       body: Column(
           children: [
-            Expanded(child: PageView.builder(
+            Expanded(child: elements.isEmpty
+            ? Center(child: const Text("No cards yet"))
+            : PageView.builder(
               controller: _pageController,
               itemCount: elements.length,
               onPageChanged: (index){

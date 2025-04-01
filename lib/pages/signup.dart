@@ -24,12 +24,12 @@ class _SignupState extends State<Signup> {
   //Login method
   void signup() async {
     //show loading circle
-    showDialog(context: context, builder: (context) => const Center(child: CircularProgressIndicator(),));
+    //showDialog(context: context, builder: (context) => const Center(child: CircularProgressIndicator(),));
 
     //make sure passwords match
     if(passwordController.text != passwordConfirmController.text){
       //pop loading cirle
-      Navigator.pop(context);
+      //Navigator.pop(context);
 
       //Show error message
       displayMessageToUser("Passwords don't match", context);
@@ -40,10 +40,10 @@ class _SignupState extends State<Signup> {
         UserCredential? userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailController.text, password: passwordController.text);
         //Add new user to database
         await createUserDocument(userCredential);
-        if(context.mounted)Navigator.pop(context);
+        //if(context.mounted)Navigator.pop(context);
         
       }on FirebaseAuthException catch (e){
-        Navigator.pop(context);
+       // if(context.mounted)Navigator.pop(context);
         displayMessageToUser(e.code, context);
       }
     }
@@ -67,83 +67,86 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-            //logo
-            Icon(
-              Icons.bolt, 
-              size: 150, 
-              color: Theme.of(context).colorScheme.inversePrimary
-            ),
-          
-            const SizedBox(height: 25),
-          
-            //app name
-            Text(
-              "F L A S H  S M I T H", 
-              style: TextStyle(fontSize: 20)
-            ),
-          
-            const SizedBox(height: 25),
-
-            //Username textfield
-            Textfields(
-              hintText: "Username", 
-              obscureText: false, 
-              controller: usernameController
-            ),
-
-            const SizedBox(height: 10),
-          
-            //email textfield
-            Textfields(
-              hintText: "Email", 
-              obscureText: false, 
-              controller: emailController
-            ),
-
-            const SizedBox(height: 10),
-
-            //password textfield
-            Textfields(
-              hintText: "Password", 
-              obscureText: true, 
-              controller: passwordController
-            ),
-          
-            const SizedBox(height: 10),
-
-            Textfields(
-              hintText: "Confirm Password", 
-              obscureText: true, 
-              controller: passwordConfirmController
-            ),
-
-            const SizedBox(height: 25),
-          
-            //login button
-            Buttons(text: "Sign up", onTap: () => signup()),
-
-            const SizedBox(height: 10),
-          
-            //Text and register button
-            Row(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(25.0),
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Have an account already? "),
-                
-                GestureDetector(
-                  onTap: widget.onTap,
-                  child: Text("Login Here", style: TextStyle(fontWeight: FontWeight.bold),),
-                )
-              ],
-            )
-            ]
+              //logo
+              Icon(
+                Icons.bolt, 
+                size: 150, 
+                color: Theme.of(context).colorScheme.inversePrimary
+              ),
+            
+              const SizedBox(height: 25),
+            
+              //app name
+              Text(
+                "F L A S H  S M I T H", 
+                style: TextStyle(fontSize: 20)
+              ),
+            
+              const SizedBox(height: 25),
+        
+              //Username textfield
+              Textfields(
+                hintText: "Username", 
+                obscureText: false, 
+                controller: usernameController
+              ),
+        
+              const SizedBox(height: 10),
+            
+              //email textfield
+              Textfields(
+                hintText: "Email", 
+                obscureText: false, 
+                controller: emailController
+              ),
+        
+              const SizedBox(height: 10),
+        
+              //password textfield
+              Textfields(
+                hintText: "Password", 
+                obscureText: true, 
+                controller: passwordController
+              ),
+            
+              const SizedBox(height: 10),
+        
+              Textfields(
+                hintText: "Confirm Password", 
+                obscureText: true, 
+                controller: passwordConfirmController
+              ),
+        
+              const SizedBox(height: 25),
+            
+              //login button
+              Buttons(text: "Sign up", onTap: () => signup()),
+        
+              const SizedBox(height: 10),
+            
+              //Text and register button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Have an account already? "),
+                  
+                  GestureDetector(
+                    onTap: widget.onTap,
+                    child: Text("Login Here", style: TextStyle(fontWeight: FontWeight.bold),),
+                  )
+                ],
+              )
+              ]
+            ),
           ),
         ),
       ),

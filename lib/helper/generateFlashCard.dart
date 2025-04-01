@@ -51,12 +51,13 @@ Future<List> generateFlashCards() async {
       final Map<String, dynamic> responseData = jsonDecode(flashcardsResponse.body);
       String result = responseData['choices'].toString();
       result = result.substring(47);
-      RegExp regExp = RegExp(r"\{'front': (.*?), 'back': (.*?)\}");
+      RegExp regExp = RegExp(r"\{'front': '(.*?)', 'back': '(.*?)\'}");
       for (RegExpMatch match in regExp.allMatches(result)) {
         String front = match.group(1)?.trim() ?? "";
         String back = match.group(2)?.trim() ?? "";
         flashcards.add([front, back]);
       }
+      print(flashcards);
       return flashcards;
     } 
     else {

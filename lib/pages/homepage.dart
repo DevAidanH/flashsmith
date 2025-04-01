@@ -68,7 +68,7 @@ class _HomepageState extends State<Homepage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Welcome ${user!["username"]}"),
+                  Text("Welcome ${user?["username"]}"),
                   const SizedBox(height: 25),
                   Buttons(text: "Generate Cards", onTap: goToGen),
                   const SizedBox(height: 25),

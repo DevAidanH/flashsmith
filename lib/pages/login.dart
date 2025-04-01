@@ -22,13 +22,13 @@ class _LoginState extends State<Login> {
   //Login method
   void login() async {
     //Show loading circle
-    showDialog(context: context, builder: (context) => const Center(child: CircularProgressIndicator(),));
+    //showDialog(context: context, builder: (context) => const Center(child: CircularProgressIndicator(),));
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text, password: passwordController.text);
-      if(context.mounted) Navigator.pop(context); 
+      //if(context.mounted) Navigator.pop(context); 
     } on FirebaseAuthException catch (e){
-      Navigator.pop(context);
+      //Navigator.pop(context);
       displayMessageToUser(e.code, context); 
     }
   }
