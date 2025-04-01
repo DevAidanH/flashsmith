@@ -46,4 +46,31 @@ class FirestoreService{
     }, SetOptions(merge: true)); 
   }
 
+  //Read cards from user's collection
+    Future<List<Map<String, String>>> readData(uid) async {
+   // Map<String, String> parsedData;
+    try {
+      DocumentSnapshot snapshot = await users.doc(uid).get();
+      if (snapshot.exists) {
+        var rawData = snapshot.get('generatedCards');
+        /*parsedData = {
+          for(var item in rawData) if(item is Map<String, dynamic>) item['front']: item['back']
+        };
+
+        return parsedData;*/
+        List<Map<String, dynamic>> castedData = rawData.cast<Map<String, dynamic>>();
+
+        List<Map<String, String>> parsedData = castedData.map((item){
+          return {
+            'front': item['front']?.toString() ?? '',
+            'back': item['back']?.toString() ?? '',
+          };
+        }).toList();
+        return parsedData;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return [];
+  }
 }

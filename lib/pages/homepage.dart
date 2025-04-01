@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flashsmith/components/buttons.dart';
 import 'package:flashsmith/pages/generateflow.dart';
+import 'package:flashsmith/pages/reviewflow.dart';
 import 'package:flashsmith/services/firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -26,32 +27,6 @@ class _HomepageState extends State<Homepage> {
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetails() async {
     return await FirebaseFirestore.instance.collection("Users").doc(currentUser!.uid).get();
   }
-  
-  //Old add card fucntion
-  /*void addManualCard([docId]){
-    showDialog(context: context, builder: (context) => AlertDialog(
-      content: Column(
-        children: [
-          TextField(controller: frontTextController,),
-          TextField(controller: backTextController,)
-        ],
-      ),
-      actions: [
-        ElevatedButton(onPressed: (){
-            if(docId == null){
-              firestoreService.addCard(frontTextController.text, backTextController.text);
-            }else{
-              firestoreService.updateCard(docId, frontTextController.text, backTextController.text);
-            }
-            frontTextController.clear();
-            backTextController.clear();
-            Navigator.pop(context);
-            
-          }, 
-          child: Text("Save"),)
-      ],
-    ));
-  }*/
 
   void logout(){
     FirebaseAuth.instance.signOut();
@@ -59,6 +34,10 @@ class _HomepageState extends State<Homepage> {
 
   void goToGen(){
     Navigator.push(context, MaterialPageRoute(builder: (context) => Generateflow(uid: uid,)));
+  }
+
+  void goToReview(){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Reviewflow(uid: uid,)));
   }
 
   @override
@@ -84,11 +63,18 @@ class _HomepageState extends State<Homepage> {
           }
           else if(snapshot.hasData){
             Map<String, dynamic>? user = snapshot.data!.data();
-            return Column(
-              children: [
-                Text("Welcome ${user!["username"]}"),
-                Buttons(text: "Generate Cards", onTap: goToGen)
-              ],
+            return Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Welcome ${user!["username"]}"),
+                  const SizedBox(height: 25),
+                  Buttons(text: "Generate Cards", onTap: goToGen),
+                  const SizedBox(height: 25),
+                  Buttons(text: "Review Cards", onTap: goToReview)
+                ],
+              ),
             );
           }
           else{

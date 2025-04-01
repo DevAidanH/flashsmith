@@ -32,7 +32,10 @@ class _GenerateflowState extends State<Generateflow> {
     for(int i = 0; i < flashcards.length; i++){
       firestoreService.addGeneratedCard(uid, flashcards[i]);
     }
-    print("saved");
+    showDialog(context: context, builder: (context) => AlertDialog(
+    content: Text("Your new flashcards have been saved"), actions: [
+      MaterialButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage()));}, child: Text("Return home"),)
+    ],));
   }
 
   @override
